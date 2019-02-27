@@ -9,8 +9,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.*;
 import android.widget.FrameLayout;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.rhona.theme.R;
+import org.rhona.theme.eventBus.OnThemeEvent;
 import org.rhona.theme.utils.AppTools;
+import org.rhona.theme.utils.IConstant;
 import org.rhona.theme.utils.OsUtil;
 import skin.support.SkinCompatManager;
 
@@ -32,10 +37,11 @@ public class BaseThemeActivity extends AppCompatActivity {
         params.height = AppTools.getStatusBarHeight(this);
         mViewStatusBarPlace.setLayoutParams(params);
         try {
-            setImmersiveStatusBar(TextUtils.isEmpty(SkinCompatManager.getInstance().getCurSkinName()), 0xffffffff);
+            setImmersiveStatusBar(SkinCompatManager.getInstance().getCurSkinName(), 0xffffffff);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        EventBus.getDefault().register(this);
     }
 
     @Override
@@ -44,23 +50,29 @@ public class BaseThemeActivity extends AppCompatActivity {
         mFrameLayoutContent.addView(contentView);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
+
     /**
-     * @param fontIconDark        是否夜间
+     * @param fontIconDark        夜间模式的时候 状态栏的文字颜色必须是白色的,
      * @param statusBarPlaceColor 状态栏的颜色
      */
-    protected void setImmersiveStatusBar(boolean fontIconDark, int statusBarPlaceColor) {
+    protected void setImmersiveStatusBar(String fontIconDark, int statusBarPlaceColor) {
+        boolean isNight = false;
+        if (IConstant.NIGHTNAME.equalsIgnoreCase(fontIconDark)) {
+            isNight = true;
+        }
         setTranslucentStatus();
-        if (fontIconDark) {
+        if (!isNight) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
                     || OsUtil.isMIUI()
                     || OsUtil.isFlyme()) {
                 setStatusBarFontIconDark(true);
             } else {
-                if (statusBarPlaceColor == Color.WHITE) {
-                    statusBarPlaceColor = 0xffcccccc;
-                } else {
-
-                }
+                statusBarPlaceColor = 0xffcccccc;
             }
         }
         setStatusBarPlaceColor(statusBarPlaceColor);
@@ -150,5 +162,24 @@ public class BaseThemeActivity extends AppCompatActivity {
         }
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onThemeEvent(final OnThemeEvent event) {
+        SkinCompatManager.getInstance().loadSkin();
+        SkinCompatManager.getInstance().loadSkin(event.getThemeName(), new SkinCompatManager.SkinLoaderListener() {
+            @Override
+            public void onStart() {
 
+            }
+
+            @Override
+            public void onSuccess() {
+                setImmersiveStatusBar(event.getThemeName(), Color.parseColor("#00ffffff"));
+            }
+
+            @Override
+            public void onFailed(String errMsg) {
+
+            }
+        });
+    }
 }

@@ -14,8 +14,6 @@ class App : Application() {
             .addInflater(SkinMaterialViewInflater())            // material design 控件换肤初始化[可选]
             .addInflater(SkinCardViewInflater())
             .loadSkin()
-
-
     }
 
 }
