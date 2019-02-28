@@ -18,11 +18,12 @@ import org.rhona.theme.utils.AppTools;
 import org.rhona.theme.utils.IConstant;
 import org.rhona.theme.utils.OsUtil;
 import skin.support.SkinCompatManager;
+import skin.support.app.SkinCompatActivity;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-public class BaseThemeActivity extends AppCompatActivity {
+public class BaseThemeActivity extends SkinCompatActivity {
     private FrameLayout mFrameLayoutContent;
     private View mViewStatusBarPlace;
 

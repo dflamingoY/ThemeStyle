@@ -14,3 +14,8 @@
 *.class
 build
 app/build
+skinblue
+skinNight
+skinorange
+skinpurple
+skinred
