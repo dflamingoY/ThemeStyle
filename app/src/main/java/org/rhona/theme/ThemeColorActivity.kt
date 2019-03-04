@@ -2,6 +2,7 @@ package org.rhona.theme
 
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_theme_color.*
 import org.greenrobot.eventbus.EventBus
 import org.rhona.theme.core.BaseAct
